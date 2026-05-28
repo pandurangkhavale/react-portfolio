@@ -1,7 +1,33 @@
 import React from 'react';
-import { Mail, Phone, Github, Linkedin, Send } from "lucide-react";
+import { Mail, Github, Linkedin, Send } from "lucide-react";
 
 export default function Contact({ form, setForm, fSt, onSubmit, onPlayTick }) {
+  const handleMouseMove = (e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+    el.style.transform = `translate3d(${x * 0.35}px, ${y * 0.35}px, 0) scale(1.03)`;
+  };
+
+  const handleMouseLeave = (e) => {
+    const el = e.currentTarget;
+    el.style.transform = `translate3d(0, 0, 0) scale(1)`;
+  };
+
+  const handleEmailClick = (e) => {
+    e.preventDefault();
+    const user = "pandurangkhavale";
+    const domain = "outlook.com";
+    window.location.href = `mailto:${user}@${domain}`;
+  };
+
+  const contactLinks = [
+    { type: "email", i: <Mail size={18} />, l: "pandurangkhavale [at] outlook.com" },
+    { type: "link", i: <Github size={18} />, l: "github.com/PandurangKhavale", h: "https://github.com/PandurangKhavale" },
+    { type: "link", i: <Linkedin size={18} />, l: "linkedin.com/in/pandurangkhavale", h: "https://www.linkedin.com/in/pandurangkhavale/" },
+  ];
+
   return (
     <section id="contact" className="section-pad">
       <div className="container">
@@ -15,19 +41,30 @@ export default function Contact({ form, setForm, fSt, onSubmit, onPlayTick }) {
               Whether you have a question, want to collaborate, or just want to say hi — my inbox is always open.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {[
-                { i: <Mail size={18} />, l: "pandurangkhavale@outlook.com", h: "mailto:pandurangkhavale@outlook.com" },
-                { i: <Phone size={18} />, l: "+91 7709900758", h: "tel:+917709900758" },
-                { i: <Github size={18} />, l: "github.com/PandurangKhavale", h: "https://github.com/PandurangKhavale" },
-                { i: <Linkedin size={18} />, l: "linkedin.com/in/pandurangkhavale", h: "https://www.linkedin.com/in/pandurangkhavale/" },
-              ].map((item, i) => (
-                <a key={i} href={item.h} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", color: "var(--muted)", fontSize: 14, transition: "all .2s" }}
-                  onMouseEnter={e => { e.currentTarget.style.color = "var(--head)"; onPlayTick(); }}
-                  onMouseLeave={e => { e.currentTarget.style.color = "var(--muted)"; }}>
-                  <span style={{ color: "var(--cyan)" }}>{item.i}</span>{item.l}
-                </a>
-              ))}
+              {contactLinks.map((item, i) => {
+                if (item.type === "email") {
+                  return (
+                    <button key={i} onClick={handleEmailClick}
+                      style={{ 
+                        display: "flex", alignItems: "center", gap: 12, border: "none", background: "none", 
+                        cursor: "none", color: "var(--muted)", fontSize: 14, transition: "all .2s", padding: 0,
+                        textAlign: "left"
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.color = "var(--head)"; onPlayTick(); }}
+                      onMouseLeave={e => { e.currentTarget.style.color = "var(--muted)"; }}>
+                      <span style={{ color: "var(--cyan)", display: "flex" }}>{item.i}</span>{item.l}
+                    </button>
+                  );
+                }
+                return (
+                  <a key={i} href={item.h} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", color: "var(--muted)", fontSize: 14, transition: "all .2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.color = "var(--head)"; onPlayTick(); }}
+                    onMouseLeave={e => { e.currentTarget.style.color = "var(--muted)"; }}>
+                    <span style={{ color: "var(--cyan)", display: "flex" }}>{item.i}</span>{item.l}
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -48,8 +85,14 @@ export default function Contact({ form, setForm, fSt, onSubmit, onPlayTick }) {
                 <textarea className="inp" placeholder="Tell me about your project..." required rows={4}
                   value={form.msg} onChange={e => setForm({ ...form, msg: e.target.value })} />
               </div>
-              <button className="bp" type="submit" style={{ justifyContent: "center", padding: 22, width: "100%", marginTop: 12, fontSize: 18 }}
-                disabled={fSt !== "idle"}>
+              <button 
+                className="bp" 
+                type="submit" 
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={{ justifyContent: "center", padding: 22, width: "100%", marginTop: 12, fontSize: 18 }}
+                disabled={fSt !== "idle"}
+              >
                 {fSt === "idle" ? (<><Send size={20} />Establish Connection</>) : fSt === "loading" ? "Processing..." : "Message Delivered! 🚀"}
               </button>
             </form>

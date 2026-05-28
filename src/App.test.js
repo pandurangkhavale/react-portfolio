@@ -10,8 +10,9 @@ describe('Portfolio App', () => {
 
   test('renders hero name', () => {
     render(<App />);
-    const nameElement = screen.getByText(/Pandurang/i);
-    expect(nameElement).toBeInTheDocument();
+    const nameElements = screen.getAllByText(/Pandurang/i);
+    expect(nameElements.length).toBeGreaterThan(0);
+    expect(nameElements[0]).toBeInTheDocument();
   });
 
   test('renders projects section', () => {

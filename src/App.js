@@ -119,15 +119,34 @@ export default function Portfolio() {
     return () => obs.disconnect();
   }, []);
 
+  /* ── Audio user-gesture activation listener ── */
+  useEffect(() => {
+    const resumeAudio = () => {
+      if (acx.current && acx.current.state === "suspended") {
+        acx.current.resume().catch(() => {});
+      }
+    };
+    window.addEventListener("click", resumeAudio, { once: true });
+    window.addEventListener("touchstart", resumeAudio, { once: true });
+    return () => {
+      window.removeEventListener("click", resumeAudio);
+      window.removeEventListener("touchstart", resumeAudio);
+    };
+  }, []);
+
   /* ── Audio helpers ── */
   const getAcx = () => {
-    if (!acx.current) acx.current = new (window.AudioContext || window.webkitAudioContext)();
+    if (!acx.current) {
+      acx.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
     return acx.current;
   };
   const playTick = useCallback(() => {
     if (muted) return;
     try {
-      const ctx = getAcx(); const o = ctx.createOscillator(); const g = ctx.createGain();
+      const ctx = getAcx();
+      if (ctx.state === "suspended") return;
+      const o = ctx.createOscillator(); const g = ctx.createGain();
       o.frequency.value = 1800; o.connect(g); g.connect(ctx.destination);
       g.gain.setValueAtTime(0.04, ctx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + .02);
@@ -137,7 +156,9 @@ export default function Portfolio() {
   const playHum = useCallback(() => {
     if (muted) return;
     try {
-      const ctx = getAcx(); const o = ctx.createOscillator(); const g = ctx.createGain();
+      const ctx = getAcx();
+      if (ctx.state === "suspended") return;
+      const o = ctx.createOscillator(); const g = ctx.createGain();
       o.type = "sine"; o.frequency.value = 80; o.connect(g); g.connect(ctx.destination);
       g.gain.setValueAtTime(0.025, ctx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + .15);
@@ -148,6 +169,7 @@ export default function Portfolio() {
     if (muted) return;
     try {
       const ctx = getAcx();
+      if (ctx.state === "suspended") return;
       [261.63, 329.63, 392].forEach((f, i) => {
         const o = ctx.createOscillator(); const g = ctx.createGain();
         o.type = "sine"; o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
@@ -161,10 +183,54 @@ export default function Portfolio() {
 
   /* ── Form submit ── */
   const handleSubmit = async e => {
-    e.preventDefault(); setFSt("loading"); playChime();
-    await new Promise(r => setTimeout(r, 1600));
-    setFSt("done");
-    setTimeout(() => { setFSt("idle"); setForm({ name: "", email: "", msg: "" }); }, 2800);
+    e.preventDefault(); 
+    setFSt("loading"); 
+    playChime();
+
+    const key = process.env.REACT_APP_WEB3FORMS_KEY;
+
+    if (!key) {
+      // Mock submit for local development if access key is not set
+      await new Promise(r => setTimeout(r, 1600));
+      setFSt("done");
+      setTimeout(() => { 
+        setFSt("idle"); 
+        setForm({ name: "", email: "", msg: "" }); 
+      }, 2800);
+      return;
+    }
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          access_key: key,
+          name: form.name,
+          email: form.email,
+          message: form.msg,
+          subject: `Portfolio Contact from ${form.name}`
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setFSt("done");
+        setTimeout(() => { 
+          setFSt("idle"); 
+          setForm({ name: "", email: "", msg: "" }); 
+        }, 2800);
+      } else {
+        setFSt("idle");
+        alert(data.message || "Form submission failed. Please try again.");
+      }
+    } catch (err) {
+      setFSt("idle");
+      alert("A network error occurred. Please try again.");
+    }
   };
 
   const navLinks = [

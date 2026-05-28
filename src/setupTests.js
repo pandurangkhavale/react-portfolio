@@ -18,3 +18,15 @@ window.matchMedia = window.matchMedia || function() {
     removeListener: function() {}
   };
 };
+
+window.HTMLCanvasElement.prototype.getContext = () => {
+  return {
+    clearRect: () => {},
+    beginPath: () => {},
+    arc: () => {},
+    fill: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    stroke: () => {}
+  };
+};

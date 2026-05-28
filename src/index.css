@@ -58,10 +58,13 @@ h1,h2,h3,h4{font-family:'Outfit',sans-serif;color:var(--head);letter-spacing:-0.
 .dock-label { position:absolute; top:-56px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--head); color:var(--bg); padding:10px 20px; border-radius:12px; font-size:13px; font-weight:700; opacity:0; pointer-events:none; transition:all 0.3s cubic-bezier(0.2, 1, 0.2, 1); box-shadow:0 15px 30px rgba(0,0,0,0.4); white-space:nowrap; }
 .dock-item:hover .dock-label { opacity:1; transform:translateX(-50%) translateY(0); }
 
+.mbtn { display: none !important; }
+
 @media(max-width:767px){
   .container { padding:0 24px; }
   .dock-container { bottom:20px; padding:10px; width:92vw; justify-content:center; gap:6px; max-width:440px; border-radius:24px; }
   .dlinks { display:none!important; }
+  .mbtn { display: flex !important; }
   .section-pad { padding: 60px 0; }
 }
 
@@ -117,3 +120,7 @@ h1,h2,h3,h4{font-family:'Outfit',sans-serif;color:var(--head);letter-spacing:-0.
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--bdr); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.card-glare {
+  mix-blend-mode: overlay;
+}

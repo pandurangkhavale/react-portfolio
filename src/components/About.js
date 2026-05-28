@@ -2,6 +2,19 @@ import React from 'react';
 import { User, FileText, MapPin, GraduationCap, Lightbulb } from "lucide-react";
 
 export default function About({ onPlayTick }) {
+  const handleMouseMove = (e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+    el.style.transform = `translate3d(${x * 0.35}px, ${y * 0.35}px, 0) scale(1.05)`;
+  };
+
+  const handleMouseLeave = (e) => {
+    const el = e.currentTarget;
+    el.style.transform = `translate3d(0, 0, 0) scale(1)`;
+  };
+
   return (
     <section id="about" className="section-pad">
       <div className="container" style={{ maxWidth: 800 }}>
@@ -17,7 +30,15 @@ export default function About({ onPlayTick }) {
             Currently exploring the frontiers of <strong style={{ color: "var(--cyan)" }}>Large Language Models</strong> and seeking high-impact opportunities in AI engineering.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", marginBottom: 40 }}>
-            <a href="resume.pdf" download="Pandurang_Khavale_Resume.pdf" className="bp" onClick={onPlayTick} style={{ padding: "18px 36px" }}>
+            <a 
+              href="resume.pdf" 
+              download="Pandurang_Khavale_Resume.pdf" 
+              className="bp" 
+              onClick={onPlayTick} 
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{ padding: "18px 36px" }}
+            >
               <FileText size={20} />Access Professional CV
             </a>
           </div>
